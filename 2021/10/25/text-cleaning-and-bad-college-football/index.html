@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.88.1" />
+
+
+<title>Text cleaning and bad college football - Caleb Badura&#39;s GitHub Site</title>
+<meta property="og:title" content="Text cleaning and bad college football - Caleb Badura&#39;s GitHub Site">
+
+
+  <link href='http://calebbadura.github.io/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/calebbadura.io">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/caleb_badura">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">2 min read</span>
+    
+
+    <h1 class="article-title">Text cleaning and bad college football</h1>
+
+    
+    <span class="article-date">2021-10-25</span>
+    
+
+    <div class="article-content">
+      
+<script src="http://calebbadura.github.io/2021/10/25/text-cleaning-and-bad-college-football/index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>Installed and loaded packages.</p>
+<p>I am using football data from Sports Reference.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.4     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggalt)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggalt&#39;:
+##   method                  from   
+##   grid.draw.absoluteGrob  ggplot2
+##   grobHeight.absoluteGrob ggplot2
+##   grobWidth.absoluteGrob  ggplot2
+##   grobX.absoluteGrob      ggplot2
+##   grobY.absoluteGrob      ggplot2</code></pre>
+<pre class="r"><code>badlogs &lt;- read_csv(&quot;~/Desktop/SPMC350/badfootballlogs19.csv&quot;)</code></pre>
+<pre><code>## Rows: 1662 Columns: 51</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (8): Date, HomeAway, Opponent, Result, TeamFull, TeamURL, Team, Conference
+## dbl (43): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, R...</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>The first step is to separate the Result column into two columns, which are: “Outcome” and “Score.” I also removed the () from the score.</p>
+<p>Since we need to separate the scores, I created two different columns of Team and Opponent Scores by separating the Score column.</p>
+<p>I saved this to the “badlogs19” dataframe.</p>
+<pre class="r"><code>badlogs %&gt;% 
+  separate(Result, into=c(&quot;Outcome&quot;,&quot;Score&quot;), sep=&quot;\\(&quot;) %&gt;%
+  mutate(Score=gsub(&quot;)&quot;,&quot;&quot;,Score)) %&gt;%
+  separate(Score, into=c(&quot;TeamScore&quot;,&quot;OpponentScore&quot;), sep=&quot;-&quot;) -&gt; badlogs19</code></pre>
+<p>I want to find the Differential, so to do that, I mutated a new field by subtracting OpponentScore from TeamScore. I saved that to a new dataframe called “Diff”</p>
+<pre class="r"><code>badlogs19 %&gt;%  mutate(OpponentScore=as.numeric(OpponentScore)) %&gt;% 
+                mutate(TeamScore = as.numeric(TeamScore)) %&gt;%
+            mutate(Differential= TeamScore- OpponentScore) %&gt;%
+  arrange(desc(Differential)) -&gt; Diff</code></pre>
+<p>I want to see specific games where the differential was above 65, so I created a new dataframe called “worstgames.”</p>
+<pre class="r"><code>worstgames &lt;- Diff %&gt;% filter(Differential &gt; 65)</code></pre>
+<p>Created a Scatterplot from the data.</p>
+<pre class="r"><code>ggplot() + geom_point(data=Diff, aes(x=TeamScore, y=OpponentScore), color=&#39;grey&#39;) +
+          geom_point(data=worstgames, aes(TeamScore, y=OpponentScore, color= &#39;red&#39;)) +
+        geom_encircle(data=worstgames, aes(x=TeamScore, y=OpponentScore), s_shape=.5, expand=.03, colour=&quot;black&quot;)+
+      labs(x=&quot;Opponent Score&quot;, y= &quot;Team Score&quot;, title= &quot;What Were The Worst Games in College Football?&quot;, subtitle= &quot;The worst games in point differential are quite easy to spot.&quot;, caption= &quot;Source= Sports-Reference.com | By Caleb Badura&quot;) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size=15, face=&quot;bold&quot;)
+  )</code></pre>
+<p><img src="http://calebbadura.github.io/2021/10/25/text-cleaning-and-bad-college-football/index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
