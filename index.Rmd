@@ -1,0 +1,70 @@
+---
+title: CFB Worst Games
+author: Caleb Badura
+date: '2021-10-24'
+slug: text-cleaning
+categories:
+  - R
+tags:
+  - R Markdown
+---
+
+Installed and loaded packages
+
+```{r}
+install.packages("ggalt")
+```
+
+```{r}
+library(tidyverse)
+library(ggalt)
+```
+
+I am using football data from Sports Reference
+
+```{r}
+badlogs <- read_csv("~/Desktop/SPMC350/badfootballlogs19.csv")
+```
+
+The first step is to separate the Result column into two columns, which are: "Outcome" and "Score." I also removed the () from the score.  
+
+Since we need to separate the scores, I created two different columns of Team and Opponent Scores by separating the Score column.  
+
+I saved this to the "badlogs19" dataframe. 
+
+```{r}
+badlogs %>% 
+  separate(Result, into=c("Outcome","Score"), sep="\\(") %>%
+  mutate(Score=gsub(")","",Score)) %>%
+  separate(Score, into=c("TeamScore","OpponentScore"), sep="-") -> badlogs19
+```
+
+I want to find the Differential, so to do that, I mutated a new field by subtracting OpponentScore from TeamScore.  I saved that to a new dataframe called "Diff"
+
+```{r}
+badlogs19 %>%  mutate(OpponentScore=as.numeric(OpponentScore)) %>% 
+                mutate(TeamScore = as.numeric(TeamScore)) %>%
+            mutate(Differential= TeamScore- OpponentScore) %>%
+  arrange(desc(Differential)) -> Diff
+```
+
+I want to see specific games where the differential was above 65, so I created a new dataframe called "worstgames."
+
+```{r}
+worstgames <- Diff %>% filter(Differential > 65)
+```
+
+Created a Scatterplot from the data. 
+
+```{r}
+ggplot() + geom_point(data=Diff, aes(x=TeamScore, y=OpponentScore), color='grey') +
+          geom_point(data=worstgames, aes(TeamScore, y=OpponentScore, color= 'red')) +
+        geom_encircle(data=worstgames, aes(x=TeamScore, y=OpponentScore), s_shape=.5, expand=.03, colour="black")+
+      labs(x="Opponent Score", y= "Team Score", title= "What Were The Worst Games in College Football?", subtitle= "The worst games in point differential are quite easy to spot.", caption= "Source= Sports-Reference.com | By Caleb Badura") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size=15, face="bold")
+  )
+  
+```
+
