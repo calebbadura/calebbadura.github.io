@@ -6,8 +6,8 @@
 <meta name="generator" content="Hugo 0.88.1" />
 
 
-<title>Fans and COVID 2020 PGA TOUR - Caleb Badura&#39;s GitHub Site</title>
-<meta property="og:title" content="Fans and COVID 2020 PGA TOUR - Caleb Badura&#39;s GitHub Site">
+<title>Did COVID Affect Play on the PGA TOUR? - Caleb Badura&#39;s GitHub Site</title>
+<meta property="og:title" content="Did COVID Affect Play on the PGA TOUR? - Caleb Badura&#39;s GitHub Site">
 
 
   <link href='http://calebbadura.github.io/favicon.ico' rel='icon' type='image/x-icon'/>
@@ -19,6 +19,11 @@
 
 
 
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
 
 
 
@@ -57,10 +62,10 @@
 
   <article class="article">
     
-    <span class="article-duration">0 min read</span>
+    <span class="article-duration">5 min read</span>
     
 
-    <h1 class="article-title">Fans and COVID 2020 PGA TOUR</h1>
+    <h1 class="article-title">Did COVID Affect Play on the PGA TOUR?</h1>
 
     
     <span class="article-date">2021-10-25</span>
@@ -71,6 +76,95 @@
 <script src="http://calebbadura.github.io/2021/10/25/fans-and-covid-2020-pga-tour/index_files/header-attrs/header-attrs.js"></script>
 
 
+<p>During the majority of the 2020 PGA TOUR season, spectators were either not allowed at all or at a very limited capacity, depending on the tournament. The presence of fans at sporting events can have a major impact on the outcomes, and that was felt heavily during many contests in 2020, as many leagues took extra precautions to limit fans and potential COVID-19 exposure.</p>
+<p>Spectators at golf tournaments can have a major part in the outcome and atmosphere of a tournament. These fans are able to be right up in the action and heat of competitive rounds, and many professionals are able to feed off this energy at times. This atmosphere may also be detrimental to certain players as well. Added pressure may come from these atmospheres.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<p>I will be loading data from PGATOUR.com to explore if this theory is true. Were there any differences in play from 2020 to the 5 years prior?</p>
+<pre class="r"><code>scoringavg &lt;- read_csv(&quot;~/Desktop/SPMC350/ScoringAvg 15-20Project.csv&quot;)</code></pre>
+<pre class="r"><code>sgputtingstats &lt;- read_csv(&quot;~/Desktop/SPMC350/SGP15-20Project.csv&quot;)</code></pre>
+<p>The two main stats I will be looking at are from PGATOUR.com, and are scoring average and average strokes gained putting. In order to find the most accurate information, I will be selecting 5 different tournaments that have taken place at the same golf course over the last 6 years from 2015-2020.</p>
+<p>First off, I want to find each player’s scoring average from those tournaments and group them together by tournament and year.</p>
+<pre class="r"><code>scoringavg %&gt;% 
+  group_by(TOURNAMENT, YEAR, PLAYER) %&gt;%
+  summarise(
+    average = sum(AVG)
+  ) -&gt; perplayer</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TOURNAMENT&#39;, &#39;YEAR&#39;. You can override using the `.groups` argument.</code></pre>
+<p>To target specific data from 2020, I created a COVID dataframe that filters out data from 2020.</p>
+<pre class="r"><code> COVID &lt;- perplayer %&gt;% filter(YEAR==2020)</code></pre>
+<pre class="r"><code>ggplot() + 
+  geom_point(data=perplayer, aes(x=PLAYER, y=average), color = &quot;grey&quot;) +
+  geom_point(data=COVID, aes(x=PLAYER, y=average), color=&quot;red&quot;) +
+  labs(
+    x=&quot;Rounds Played&quot;, 
+    y=&quot;Scoring Average&quot;, 
+    title=&quot;Do 2020 COVID Fanless Rounds Stand Out?&quot;, 
+    subtitle=&quot;Six years of 5 tournaments show that RED fanless rounds caused by the pandemic in 2020 really don&#39;t stand out from the rest&quot;,
+    caption=&quot;Source: PGATOUR.com | By Caleb Badura&quot;) + 
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 20, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    plot.subtitle = element_text(size=8), 
+    panel.grid.minor = element_blank()
+    ) </code></pre>
+<p><img src="http://calebbadura.github.io/2021/10/25/fans-and-covid-2020-pga-tour/index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+From this table, we can see that the red fanless scoring averages do not stand out much from the 5 prior years of tournaments with full fans. While scoring average is one major aspect of the game, more data we can explore is performance on the greens. Specifically in strokes gained putting.</p>
+<p>To simplify the data, I will create a dataframe that shows average strokes gained putting for all 5 tournaments over 6 years.</p>
+<pre class="r"><code>sgputtingstats %&gt;% 
+  group_by(YEAR) %&gt;%
+  summarise(
+    AverageSGPutting = mean(AVERAGE)
+  ) -&gt; sgpstats</code></pre>
+<p>The dataframe of COVIDputting was created to specify data from 2020.</p>
+<pre class="r"><code>COVIDputting &lt;- sgpstats %&gt;% filter(YEAR == &#39;2020&#39;)</code></pre>
+<pre class="r"><code>ggplot() + 
+  geom_bar(data=sgpstats, aes(x=YEAR, weight=AverageSGPutting)) +
+  geom_bar(data=COVIDputting, aes(x=YEAR, weight=AverageSGPutting), fill = &quot;red&quot;) + 
+  labs(
+    x=&quot;YEAR&quot;, 
+    y=&quot;AVG Strokes-Gained-Putting&quot;, 
+    title=&quot;Do the Presence of Fans Affect Performance on the Greens?&quot;, 
+    subtitle=&quot;Average strokes-gained-putting difference from year-to-year is minimal on TOUR &quot;, 
+    caption=&quot;Source: PGATOUR.com | By Caleb Badura&quot;) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+  )</code></pre>
+<p><img src="http://calebbadura.github.io/2021/10/25/fans-and-covid-2020-pga-tour/index_files/figure-html/unnamed-chunk-9-1.png" width="672" />
+Now we’re getting somewhere. Although average strokes gained putting from year to year is very minimal, we are able to see how the 2020 average is more than any data from 2015-2018. There was a decrease in 2020 from 2019, which is interesting as well. Compared to the majority of the data, there is a possibility we are able to conclude that players on the PGA TOUR had better putting performances during fanless 2020 tournaments than they did in years prior.</p>
+<p>Since we have already looked at scoring averages from year to year, I now want to explore if there is any change in scoring from each tournament from year to year. With this new dataframe, I will group by tournament and year and mutate a new field that specifies the tournament and the year it was played, which will help with the chart.</p>
+<pre class="r"><code>scoringavg %&gt;% 
+  group_by(TOURNAMENT, YEAR) %&gt;%
+  summarise(
+   ScoringAVERAGE = mean(AVG)) %&gt;%
+  mutate(TournamentYear= paste(TOURNAMENT, YEAR, sep = &quot;  &quot;)
+  ) -&gt; tournamentscoringavg</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TOURNAMENT&#39;. You can override using the `.groups` argument.</code></pre>
+<p>For this graph, I have created a dataframe to specify 2020 data, and that will be depicted by a red line.</p>
+<pre class="r"><code>tournaments2020 &lt;-tournamentscoringavg %&gt;% 
+  filter(YEAR == &quot;2020&quot;)</code></pre>
+<pre class="r"><code>ggplot() +
+  geom_line(data = tournamentscoringavg, aes(x=TOURNAMENT, y=ScoringAVERAGE, group=YEAR), color=&quot;grey&quot;) +
+  geom_line(data = tournaments2020, aes(x=TOURNAMENT, y=ScoringAVERAGE, group=YEAR), color=&quot;red&quot;) +
+  labs(
+    x=&quot;TOURNAMENT&quot;, 
+    y=&quot;SCORING AVERAGE&quot;, 
+    title=&quot;No Fans = Lower Scores ?&quot;, 
+    subtitle=&quot;2020 Scoring Averages for a few tournaments are marginally less than prior years.&quot;, 
+    caption=&quot;Source: PGATOUR.com | By Caleb Badura&quot;) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 20, face = &quot;bold&quot;),
+    axis.title = element_text(size = 11), 
+    plot.subtitle = element_text(size=15), 
+    panel.grid.minor = element_blank()
+  )</code></pre>
+<p><img src="http://calebbadura.github.io/2021/10/25/fans-and-covid-2020-pga-tour/index_files/figure-html/unnamed-chunk-12-1.png" width="1152" />
+With this line graph, we are able to see scoring averages per tournament over the past 6 years. While there are 2 tournaments that have much lower scoring averages than the other 3, the most interesting part comes from those 3 higher scoring averaging tournaments. We are able to see that the red fanless line is lower than the other 5 years in those tournaments specifically. While it is not by a wide margin at all, there is still some data that again shows how the 2020 fanless tournaments caused by COVID have improved play and those specific stats on the PGA TOUR.</p>
 
     </div>
   </article>
@@ -93,6 +187,18 @@
 
     </div>
     
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
 
     
 
