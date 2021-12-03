@@ -143,7 +143,6 @@ Now we’re getting somewhere. Although average strokes gained putting from year
    ScoringAVERAGE = mean(AVG)) %&gt;%
   mutate(TournamentYear= paste(TOURNAMENT, YEAR, sep = &quot;  &quot;)
   ) -&gt; tournamentscoringavg</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TOURNAMENT&#39;. You can override using the `.groups` argument.</code></pre>
 <p>For this graph, I have created a dataframe to specify 2020 data, and that will be depicted by a red line.</p>
 <pre class="r"><code>tournaments2020 &lt;-tournamentscoringavg %&gt;% 
   filter(YEAR == &quot;2020&quot;)</code></pre>
