@@ -133,7 +133,7 @@ Frost’s win percentages over his four seasons at Nebraska have been quite disa
     ) + 
   theme_minimal() + 
   theme(
-    plot.title = element_text(size = 14, face = &quot;bold&quot;),
+    plot.title = element_text(size = 15, face = &quot;bold&quot;),
     axis.title = element_text(size = 11), 
     plot.subtitle = element_text(size=10), 
     panel.grid.minor = element_blank()
@@ -171,7 +171,9 @@ Coach Nee’s squad bounced back after his second season, while Coach Hoiberg’
 <pre class="r"><code>hoibergrecruiting &lt;- cbbrankings %&gt;%
   filter(SCHOOL == &quot;Nebraska&quot;)</code></pre>
 <p>With this data, I will be focusing on Nebraska’s rankings, which is why I created these two dataframes for specifically Frost and Hoiberg.</p>
-<pre class="r"><code>ggplot() + geom_line(data=hoibergrecruiting, aes(x=CLASS, y=RANK), color=&quot;red&quot;) + scale_y_reverse()+ 
+<pre class="r"><code>ggplot() + 
+  geom_line(data=hoibergrecruiting, aes(x=CLASS, y=RANK), color=&quot;red&quot;) + 
+  scale_y_reverse()+ 
   labs(
     x=&quot;Class&quot;, 
     y=&quot;Rank&quot;, 
@@ -189,7 +191,9 @@ Coach Nee’s squad bounced back after his second season, while Coach Hoiberg’
 <p><img src="http://calebbadura.github.io/2021/11/30/hot-seats-for-nebraska-coaches/index_files/figure-html/unnamed-chunk-16-1.png" width="672" />
 It took Fred Hoiberg only a couple seasons to secure the first five-star high school recruit in program history in Bryce McGowens. With that and a few other key signees, Nebrasketball landed a Top-25 recruiting class in 2021. Although Hoiberg’s record as a coach at Nebraska has been quite poor, this year’s recruiting class shows that Hoiberg is beginning to get his guys in. Although the Big Ten conference play this year may be a struggle, watch out for Nebrasketball to make a run.</p>
 <p>Next, let’s take a look at Scott Frost’s recruiting over his past few season while at Nebraska.</p>
-<pre class="r"><code>ggplot() + geom_line(data=frostrecruiting, aes(x=CLASS, y=RANK), color=&quot;red&quot;) + scale_y_reverse()+ 
+<pre class="r"><code>ggplot() + 
+  geom_line(data=frostrecruiting, aes(x=CLASS, y=RANK), color=&quot;red&quot;) +
+  scale_y_reverse()+ 
   labs(
     x=&quot;Class&quot;, 
     y=&quot;Rank&quot;, 
@@ -206,7 +210,7 @@ It took Fred Hoiberg only a couple seasons to secure the first five-star high sc
     )</code></pre>
 <p><img src="http://calebbadura.github.io/2021/11/30/hot-seats-for-nebraska-coaches/index_files/figure-html/unnamed-chunk-17-1.png" width="672" />
 Although Nebraska football has always been a force in college football recruiting, Scott Frost has vaulted them into the Top 20. Recent decline in the rankings over the past couple classes may not be a great trend for Frost and staff, but consistently being in company with the top teams in the country is a positive. Although, this graph and recruiting rankings show that recruiting may not be the issue for Nebraska football.</p>
-<p>The recent struggles of both of these coaches and their squads come as a bit of a surprise once one goes through this data. Experiencing losing seasons year after year with Top 25 recruiting classes is not a great trend. My theory for these struggles is that there may be a bit of bad luck, but also just growing pains and a bit stiffer competition. Coach Hoiberg and Coach Frost have had success at previous schools, but Big Ten play is a whole different monster. Recruiting and getting the right guys certainly takes time, which is why Husker fans need to take it easy.</p>
+<p>The recent struggles of both of these coaches and their squads come as a bit of a surprise once one goes through this data. Experiencing losing seasons year after year with Top-25 recruiting classes is not a great trend. My theory for these struggles is that there may be a bit of bad luck, but also just growing pains and a bit stiffer competition. Coach Hoiberg and Coach Frost have had success at previous schools, but Big Ten play is a whole different monster. Recruiting and getting the right guys certainly takes time, which is why Husker fans need to take it easy.</p>
 <p>Although, the coming seasons for both of these coaches will be a major indicator on their futures in Lincoln.</p>
 
     </div>
