@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.88.1" />
+
+
+<title>Hot Seats for Huskers?  - Caleb Badura&#39;s GitHub Site</title>
+<meta property="og:title" content="Hot Seats for Huskers?  - Caleb Badura&#39;s GitHub Site">
+
+
+  <link href='http://calebbadura.github.io/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/calebbadura.io">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/caleb_badura">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">7 min read</span>
+    
+
+    <h1 class="article-title">Hot Seats for Huskers? </h1>
+
+    
+    <span class="article-date">2021-12-05</span>
+    
+
+    <div class="article-content">
+      
+<script src="http://calebbadura.github.io/2021/12/05/hot-seats-for-nebraska-coaches/index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>Scott Frost and Fred Hoiberg have had an interesting few years as head coaches at the University of Nebraska. Frost, who just finished his fourth year as the coach of Nebraska Football, now carries a 15-29 record in his Nebraska career. On the other hand, Fred Hoiberg, now holds a 19-48 record as he has just begun his third season as the head coach of Nebraska Basketball.</p>
+<p>Not too hot.</p>
+<p>But their seats on the other hand, may be warming up.</p>
+<pre class="r"><code>library(tidyverse)
+library(gt)
+library(ggbump)</code></pre>
+<p>Do either of these coaches need to be concerned with losing their jobs in the near future? I will be taking a look at various data, including past records, win percentages, and recruiting rankings to take a deeper dive into what the future holds for these two Nebraska head coaches.</p>
+<pre class="r"><code>huskerfbnation &lt;- read_csv(&quot;~/Desktop/PROJECT #2 DATA/Nebraska Cornhuskers FB Stats (1).csv&quot;)</code></pre>
+<pre class="r"><code>nebrasketball &lt;- read_csv(&quot;~/Desktop/PROJECT #2 DATA/Nebraska Cornhuskers Bball Stats.csv&quot;) %&gt;% mutate(Date = as.Date(Date))</code></pre>
+<p>First off, I will be taking data from Sports Reference to look at in-depth stats from each season in both Nebraska football and basketball history. Let’s start off with some Cornhusker Football.</p>
+<pre class="r"><code>huskerfbnationwinpct &lt;- huskerfbnation %&gt;%
+  select(Year, WinPct, `Coach(es)`)</code></pre>
+<p>To narrow down the data, I will be selecting Win Percentages from each season.</p>
+<pre class="r"><code>frost &lt;- huskerfbnationwinpct %&gt;% 
+  filter(`Coach(es)` == &#39;Scott Frost&#39;)</code></pre>
+<pre class="r"><code>to &lt;- huskerfbnationwinpct %&gt;% 
+  filter(`Coach(es)` == &#39;Tom Osborne&#39;)</code></pre>
+<p>How does Scott Frost’s tenure at Nebraska compare to Nebraska legend’s Tom Osborne? I will be highlighting Coach Osborne’s seasons in Green and Coach Frost’s in Red.</p>
+<pre class="r"><code>ggplot() + 
+  geom_point(data=huskerfbnationwinpct, aes(x=Year, y=WinPct)) +
+  geom_point(data=frost, aes(x=Year, y=WinPct), color=&quot;red&quot;)+
+  geom_point(data=to, aes(x=Year, y=WinPct),color=&quot;Green&quot;) + 
+  labs(
+    x=&quot;Year&quot;, 
+    y=&quot;Win Pct&quot;, 
+    title=&quot;Frost-Era Near the Worst&quot;, 
+    subtitle=&quot;Legendary coach Tom Osborne finished one season under .750.  In 4 seasons, Scott Frost hasn&#39;t finished above .500&quot;,
+    caption=&quot;Source: Sports Reference | By Caleb Badura&quot;
+    ) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    plot.subtitle = element_text(size=9), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="http://calebbadura.github.io/2021/12/05/hot-seats-for-nebraska-coaches/index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+Frost’s win percentages over his four seasons at Nebraska have been quite disappointing. Consistent is what comes to mind when looking at Coach Osborne’s legendary run as HC. Yes, those are the glory days, and Coach Frost has a lot of work to do, but there’s always next year… right?</p>
+<p>Now how about Fred Hoiberg and “Nebrasketball?” How have his seasons as HC stacked up against some of the greats?</p>
+<p>Coach Hoiberg just began his third season at the helm of Husker Hoops, so what is a realistic expectation for this year?</p>
+<p>I will be adding filters to narrow down my results to each HC in Nebraska basketball history and their win percentages in their first three seasons.</p>
+<pre class="r"><code>top3seasons &lt;- nebrasketball %&gt;% 
+  group_by(`Coach(es)`) %&gt;% 
+  slice_min(order_by= Season, n = 3) %&gt;%
+  filter(`Coach(es)`== &quot;Fred Hoiberg&quot;| `Coach(es)`== &quot;Tim Miles&quot; | `Coach(es)`== &quot;Doc Sadler&quot; | `Coach(es)`== &quot;Barry Collier&quot; | `Coach(es)`== &quot;Danny Nee&quot; | `Coach(es)`== &quot;Moe Iba&quot; | `Coach(es)`== &quot;Joe Cipriano&quot; | `Coach(es)`== &quot;Jerry Bush&quot; | `Coach(es)`== &quot;Harry Good&quot; | `Coach(es)`== &quot;Adolph Lewandowski&quot; | `Coach(es)`== &quot;William Browne&quot; | `Coach(es)`== &quot;Charlie Black&quot; | `Coach(es)`== &quot;Doc Stewart&quot; | `Coach(es)`== &quot;Jumbo Stiehm&quot; | `Coach(es)`== &quot;R.G. Clapp&quot;)</code></pre>
+<pre class="r"><code>ggplot() + 
+  geom_line(data=top3seasons, aes(x=Date, y=WinPct,group=`Coach(es)`)) + 
+  facet_wrap(~`Coach(es)`) + 
+  labs(
+    x=&quot;Year&quot;, 
+    y=&quot;Win Pct&quot;, 
+    title=&quot;How Do Fred Hoiberg&#39;s First Three Seasons Stack Up?&quot;, 
+    subtitle=&quot;The first three seasons of head coaches at Nebraska vary greatly in win percentage.&quot;,
+    caption=&quot;Source: Sports Reference | By Caleb Badura&quot;
+    ) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 15, face = &quot;bold&quot;),
+    axis.title = element_text(size = 11), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="http://calebbadura.github.io/2021/12/05/hot-seats-for-nebraska-coaches/index_files/figure-html/unnamed-chunk-9-1.png" width="768" />
+Now that we have all the coaches and their first three seasons, we can see just how up and down college hoops from year-to-year can be. To be more specific, lets take a look at arguably the most successful coach in Nebraska basketball history, Danny Nee. In his 14 seasons as HC, Nee carried a 254-190 record and led the Huskers to five NCAA tournament appearances. How were Coach Nee’s first three seasons in comparison to Coach Hoiberg’s?</p>
+<pre class="r"><code>hoibergnee &lt;- nebrasketball %&gt;% 
+  group_by(`Coach(es)`) %&gt;% 
+  slice_min(order_by= Season, n = 3) %&gt;%
+  filter(`Coach(es)`== &quot;Fred Hoiberg&quot; | `Coach(es)` == &quot;Danny Nee&quot;)</code></pre>
+<pre class="r"><code>ggplot() + 
+  geom_line(data=hoibergnee, aes(x=Season, y=WinPct,group=`Coach(es)`)) + 
+  facet_wrap(~`Coach(es)`) + 
+  labs(
+    x=&quot;Year&quot;, 
+    y=&quot;Win Pct&quot;, 
+    title=&quot;Nee vs. Hoiberg: Is There Hope for Hoiberg?&quot;, 
+    subtitle=&quot;How do Hoiberg&#39;s first three seasons as HC compare to Nebraska coaching legend Danny Nee&#39;s?&quot;,
+    caption=&quot;Source: Sports Reference | By Caleb Badura&quot;
+    ) + 
+  theme_gray() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="http://calebbadura.github.io/2021/12/05/hot-seats-for-nebraska-coaches/index_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+Coach Nee’s squad bounced back after his second season, while Coach Hoiberg’s squad is continuing to trend upward after a 5-2 start to the year. Maybe there is hope for Nebrasketball after all.</p>
+<pre class="r"><code>cfbrankings &lt;- read_csv(&quot;~/Desktop/PROJECT #2 DATA/CFB Recruting Rankings.csv&quot;)</code></pre>
+<pre class="r"><code>cbbrankings &lt;- read_csv(&quot;~/Desktop/PROJECT #2 DATA/CBB Recruiting Rankings.csv&quot;)</code></pre>
+<p>A team’s performance and win percentages are one thing, but recruiting is also a major indicator of how good of a job a coaching staff is doing. I will be loading data from Rivals.com, which gives the recruiting rankings of each college football and basketball team over the past few years.</p>
+<pre class="r"><code>frostrecruiting &lt;- cfbrankings %&gt;%
+  filter(SCHOOL == &quot;Nebraska&quot;)</code></pre>
+<pre class="r"><code>hoibergrecruiting &lt;- cbbrankings %&gt;%
+  filter(SCHOOL == &quot;Nebraska&quot;)</code></pre>
+<p>With this data, I will be focusing on Nebraska’s rankings, which is why I created these two dataframes for specifically Frost and Hoiberg.</p>
+<pre class="r"><code>ggplot() + 
+  geom_line(data=hoibergrecruiting, aes(x=CLASS, y=RANK), color=&quot;red&quot;) + 
+  scale_y_reverse()+ 
+  labs(
+    x=&quot;Class&quot;, 
+    y=&quot;Rank&quot;, 
+    title=&quot;Is Nebrasketball Back?&quot;, 
+    subtitle=&quot;With a Top 25 recruiting class, Coach Hoiberg is poised to make a run this season.&quot;,
+    caption=&quot;Source: Rivals | By Caleb Badura&quot;
+    ) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="http://calebbadura.github.io/2021/12/05/hot-seats-for-nebraska-coaches/index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>It took Fred Hoiberg only a couple seasons to secure the first five-star high school recruit in program history in Bryce McGowens. With that and a few other key signees, Nebrasketball landed a Top-25 recruiting class in 2021. Although Hoiberg’s record as a coach at Nebraska has been quite poor, this year’s recruiting class shows that Hoiberg is beginning to get his guys in. Although Big Ten conference play this year may be a struggle, watch out for Nebrasketball to make a run.</p>
+<p>Next, let’s take a look at Scott Frost’s recruiting over his past few season while at Nebraska.</p>
+<pre class="r"><code>ggplot() + 
+  geom_line(data=frostrecruiting, aes(x=CLASS, y=RANK), color=&quot;red&quot;) +
+  scale_y_reverse()+ 
+  labs(
+    x=&quot;Class&quot;, 
+    y=&quot;Rank&quot;, 
+    title=&quot;Meanwhile... Nebraska Football May Not Be&quot;, 
+    subtitle=&quot;Although consistently in the Top 20 recruiting classes, Frost&#39;s squads are on a decline &quot;,
+    caption=&quot;Source: Rivals | By Caleb Badura&quot;
+    ) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="http://calebbadura.github.io/2021/12/05/hot-seats-for-nebraska-coaches/index_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+Although Nebraska football has always been a force in college football recruiting, Scott Frost has vaulted them into the Top 20. Recent decline in the rankings over the past couple classes may not be a great trend for Frost and staff, but consistently being in company with the top teams in the country is a positive. Although, this graph and recruiting rankings show that recruiting may not be the issue for Nebraska football.</p>
+<p>The recent struggles of both of these coaches and their squads come as a bit of a surprise once one goes through this data. Experiencing losing seasons year after year with Top-25 recruiting classes is not a great trend. My theory for these struggles is that there may be a bit of bad luck, but also just growing pains and a bit stiffer competition. Coach Hoiberg and Coach Frost have had success at previous schools, but Big Ten play is a whole different monster. Recruiting and getting the right guys certainly takes time, which is why Husker fans need to take it easy.</p>
+<p>Although, the coming seasons for both of these coaches will be a major indicator on their futures in Lincoln.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
